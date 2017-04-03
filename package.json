@@ -1,0 +1,24 @@
+{
+  "name": "roxy",
+  "version": "0.1.0",
+  "description": "Proxy and debug tool",
+  "main": "./main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron --enable-logging ."
+  },
+  "keywords": [
+    "proxy"
+  ],
+  "author": "Nikolay Soroka",
+  "license": "MIT",
+  "dependencies": {
+    "http-proxy": "^1.16.2",
+    "morgan": "^1.8.1",
+    "pug": "^2.0.0-beta11",
+    "rxjs": "^5.2.1-smooth"
+  },
+  "devDependencies": {
+    "electron": "^1.6.2"
+  }
+}
