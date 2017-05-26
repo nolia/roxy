@@ -15,7 +15,8 @@ let button;
 let server;
 let messageContainer;
 
-const messageTemplate = pug.compileFile('./app/message-item.pug');
+const messageView = pug.compileFile('./app/message-item.pug');
+const detailsView = pug.compileFile('./app/views/message-details.pug');
 
 function initProxyServer() {
     if (server) {
@@ -26,10 +27,16 @@ function initProxyServer() {
     server.proxy.messageSubject.subscribe(
         function (message) {
             const element = document.createElement('div');
+            element.className = "message-wrap";
+            element.tabIndex = -1;
             messageContainer.appendChild(element);
 
+            element.onclick = function () {
+                onMessageSelected(element, message);
+            };
+
             const updateMessageView = function (message) {
-                element.innerHTML = messageTemplate({message: message});
+                element.innerHTML = messageView({message: message});
             };
 
             message.updateSubject.subscribe(updateMessageView);
@@ -37,6 +44,22 @@ function initProxyServer() {
     );
 
     return server;
+}
+
+function displayDetails(message) {
+    var requestData = message.getRequestData();
+    var responseData = message.getResponseData();
+
+    document.getElementById('content').innerHTML = detailsView({
+        requestData: requestData,
+        responseData: responseData
+    })
+}
+function onMessageSelected(element, message) {
+    window.setTimeout(function () {
+        console.log("focusing:", element);
+        displayDetails(message);
+    }, 0);
 }
 
 function setRunning (running) {
@@ -66,7 +89,7 @@ window.onload = function () {
     button.onclick = function () {
         setRunning(!isRunning);      
     };
-    setRunning(false);
+    setRunning(true);
 
     console.log("I'm a teapot!!!");
 };

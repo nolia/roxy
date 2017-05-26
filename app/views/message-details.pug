@@ -1,0 +1,16 @@
+//
+   Created by nikolaysoroka on 03.04.17.
+
+style
+    include message-details.css
+
+div.message-details-container
+    div.request-wrap.align-top
+        div.title REQUEST
+        div.code-wrap
+            pre.raw #{requestData}
+
+    div.request-wrap.align-bottom
+        div.title RESPONSE
+        div.code-wrap
+            pre.raw #{responseData}
