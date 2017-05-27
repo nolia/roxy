@@ -63,6 +63,10 @@ Message.prototype.getRequestData = function () {
 
 Message.prototype.getResponseData = function () {
     var res = this.response;
+    if (!res) {
+        return null;
+    }
+
     var result =  util.format("HTTP/%s %d", res.httpVersion, res.statusCode);
 
     for (var h in res.headers) {

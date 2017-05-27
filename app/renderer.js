@@ -14,6 +14,9 @@ let isRunning;
 let button;
 let server;
 let messageContainer;
+let listenAddressText;
+let selectedMessageView;
+let selectedMessageSubscription;
 
 const messageView = pug.compileFile('./app/message-item.pug');
 const detailsView = pug.compileFile('./app/views/message-details.pug');
@@ -26,6 +29,8 @@ function initProxyServer() {
     server = proxy.createProxy();
     server.proxy.messageSubject.subscribe(
         function (message) {
+            console.log('adding message');
+
             const element = document.createElement('div');
             element.className = "message-wrap";
             element.tabIndex = -1;
@@ -39,6 +44,7 @@ function initProxyServer() {
                 element.innerHTML = messageView({message: message});
             };
 
+            updateMessageView(message);
             message.updateSubject.subscribe(updateMessageView);
         }
     );
@@ -50,14 +56,31 @@ function displayDetails(message) {
     var requestData = message.getRequestData();
     var responseData = message.getResponseData();
 
-    document.getElementById('content').innerHTML = detailsView({
+    let args = {
         requestData: requestData,
-        responseData: responseData
-    })
+        responseData: null
+    };
+
+    if (responseData) {
+        args.responseData = responseData;
+    }
+
+    document.getElementById('content').innerHTML = detailsView(args)
 }
+
 function onMessageSelected(element, message) {
     window.setTimeout(function () {
-        console.log("focusing:", element);
+        if (selectedMessageView) {
+            selectedMessageView.style.backgroundColor = 'transparent';
+        }
+        if (selectedMessageSubscription) {
+            selectedMessageSubscription.unsubscribe();
+        }
+        selectedMessageSubscription = message.updateSubject.subscribe(displayDetails);
+
+        element.style.backgroundColor = '#E9ECED';
+        selectedMessageView = element;
+
         displayDetails(message);
     }, 0);
 }
@@ -73,18 +96,21 @@ function setRunning (running) {
 
         server.listen(5050);
         button.innerHTML = 'stop';
+        listenAddressText.innerHTML = util.format('addresses: %s\nport = 5050', proxy.getCurrentIpAddress());
     } else {
         if (server) {
             server.close();
         }
 
         button.innerHTML = 'start';
+        listenAddressText.innerHTML = '';
     }
 }
 
 window.onload = function () {
-    button = document.getElementById("start-stop");    
+    button = document.getElementById("start-stop");
     messageContainer = document.getElementById("messages-container");
+    listenAddressText = document.getElementById("listen-address");
 
     button.onclick = function () {
         setRunning(!isRunning);      
